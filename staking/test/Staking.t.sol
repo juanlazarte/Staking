@@ -4,18 +4,9 @@ pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
 import {StakingNft} from "../src/Staking.sol";
-import {ERC20Mock} from "";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IERC20} from "../src/IERC20.sol";
+import {ERC20Mock} from "../lib/openzeppelin-contracts/contracts/mocks/token/ERC20Mock.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
-// Mock ERC20 token for rewards
-contract MockERC20 is ERC20 {
-    constructor() ERC20("Mock Reward Token", "MRT") {}
-
-    function mint(uint256 amount) external {
-        _mint(msg.sender, amount);
-    }
-}
 
 // Mock ERC721 token for staking
 contract MockERC721 is ERC721 {
@@ -29,14 +20,14 @@ contract MockERC721 is ERC721 {
 
 contract StakingNftTest is Test {
     StakingNft public stakingNft;
-    MockERC20 public rewardToken;
+    ERC20Mock public rewardToken;
     MockERC721 public nftToken;
     address public user;
 
     function setUp() public {
-        rewardToken = new MockERC20();
+        rewardToken = new ERC20Mock();
         nftToken = new MockERC721();
-        stakingNft = new StakingNft(IERC721(address(nftToken)), IERC20(address(rewardToken)));
+        stakingNft = new StakingNft(nftToken, rewardToken);
 
         user = address(0x1234);
         vm.startPrank(user);
